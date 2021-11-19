@@ -27,3 +27,5 @@ Hybrid Direct Embedding and Hybrid Angle Embedding have variations depending on 
 
 ### 4. Benchmarking
 **"Benchmarking.py"**: trains quantum circuit for given dataset, unitary ansatze, and encoding / embedding method. Saves training loss history and test data accuracy after training. Encoding_to_Embedding function converts Encoding (classical preprocessing feature reduction) to Embedding (Classical data embedding into Quantum Circuit).
+
+**You need to create Result folder to run QOSF code** 

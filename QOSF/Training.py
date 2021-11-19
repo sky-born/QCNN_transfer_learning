@@ -40,12 +40,12 @@ def cost(params, X, Y, U, U_params, embedding_type, circuit, cost_fn):
 # Circuit training parameters
 
 # step size
-# steps = 200
-steps = 30
+steps = 200
+# steps = 30
 learning_rate = 0.01
 
 
-batch_size = 25
+batch_size = 50
 
 def circuit_training(X_train, Y_train, U, U_params, embedding_type, circuit, cost_fn):
     if circuit == 'QCNN':
@@ -55,7 +55,10 @@ def circuit_training(X_train, Y_train, U, U_params, embedding_type, circuit, cos
 
     params = np.random.randn(total_params)
     opt = qml.NesterovMomentumOptimizer(stepsize=learning_rate)
+    # opt = qml.AdamOptimizer(stepsize=learning_rate)
     loss_history = []
+    # best_cost = None
+    # best_params = None
 
     for it in range(steps):
 
@@ -66,9 +69,19 @@ def circuit_training(X_train, Y_train, U, U_params, embedding_type, circuit, cos
         params, cost_new = opt.step_and_cost(lambda v: cost(v, X_batch, Y_batch, U, U_params, embedding_type, circuit, cost_fn),
                                                      params)
         loss_history.append(cost_new)
+
+        # save best cost parameters -> can overfitting
+        # if best_cost == None:
+        #     best_cost = cost_new
+        #     best_params = params
+        # if best_cost > cost_new:
+        #     best_cost = cost_new
+        #     best_params = params
+
         if it % 10 == 0:
             print("iteration: ", it, " cost: ", cost_new)
 
+        
+    # return best paragrams
     return loss_history, params
-
 

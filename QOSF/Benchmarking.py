@@ -19,7 +19,7 @@ def accuracy_test(predictions, labels, cost_fn, binary = True):
                 if np.abs(l - p) < 0.5:
                     acc = acc + 1
             return acc / len(labels)
-
+    # for l is 0 or 1
     elif cost_fn == 'cross_entropy':
         acc = 0
         for l,p in zip(labels, predictions):
@@ -33,6 +33,14 @@ def accuracy_test(predictions, labels, cost_fn, binary = True):
 
 
 def Encoding_to_Embedding(Encoding):
+    # Note that numer of input parameters: X train = (data, num input parameter)
+    # Amplitude = 256
+    # Angle = 8
+    # Amplitude Hybrid 4 = 32
+    # Amplitude Hybrid 2 = 16
+    # Angular Hybrid 4 = 30
+    # Angular Hybrid 2 = 12
+    # Angle compact = 16
     # Amplitude Embedding / Angle Embedding
     if Encoding == 'resize256':
         Embedding = 'Amplitude'

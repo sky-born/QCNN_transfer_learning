@@ -49,10 +49,6 @@ def Benchmarking_Hybrid_Accuracy(dataset, classes, Unitary, U_num_param, Encodin
 
             loss_history, trained_params = Training.circuit_training(X_train, Y_train, U, U_params, Embedding, circuit, cost_fn)
             predictions = [QCNN_circuit.QCNN(x, trained_params, U, U_params, Embedding) for x in X_test]
-            # accuracy None <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            # print('prediction', predictions)
-            # print('Y test',Y_test)
-            # print('bianry',binary)
             accuracy = accuracy_test(predictions, Y_test, cost_fn, binary)
             print('accuracy',accuracy)
             print("Accuracy for " + U + " " + Encoding + " :" + str(accuracy))
@@ -99,20 +95,31 @@ def Benchmarking_Hybrid_Entanglement(dataset, classes, Encodings, N_samples, bes
         f.write("\n")
         f.close()
 
-dataset = 'mnist'
-classes = [0,1]
-Unitary = 'U_SU4'
-U_num_param = 15
-circuit = 'QCNN'
-N_samples = 1000
-cost_fn = 'cross_entropy'
+
+if __name__ == "__main__":
+    dataset = 'mnist'
+    classes = [0,1]
+
+    # Unitary and unitary parameters are written in unitary.py
+    Unitary = 'U_SU4'
+    U_num_param = 15
+
+    # Quantum circuit have 'QCNN' and 'Hierarchical' model
+    circuit = 'QCNN'
+    N_samples = 1000
+
+    # cost_fn can select 'cross_entropy' or 'mse'
+    cost_fn = 'cross_entropy'
 
 
-#Encodings = ['pca30-1', 'autoencoder30-1', 'pca12-1', 'autoencoder12-1', 'pca32-1', 'autoencoder32-1', 'pca16-1', 'autoencoder16-1',
-#             'pca30-2', 'autoencoder30-2', 'pca12-2', 'autoencoder12-2', 'pca32-2', 'autoencoder32-2', 'pca16-2', 'autoencoder16-2',
-#             'pca30-3', 'autoencoder30-3', 'pca12-3', 'autoencoder12-3', 'pca32-3', 'autoencoder32-3', 'pca16-3', 'autoencoder16-3',
-#             'pca30-4', 'autoencoder30-4', 'pca12-4', 'autoencoder12-4', 'pca32-4', 'autoencoder32-4', 'pca16-4', 'autoencoder16-4']
+    #Encodings = ['pca30-1', 'autoencoder30-1', 'pca12-1', 'autoencoder12-1', 'pca32-1', 'autoencoder32-1', 'pca16-1', 'autoencoder16-1',
+    #             'pca30-2', 'autoencoder30-2', 'pca12-2', 'autoencoder12-2', 'pca32-2', 'autoencoder32-2', 'pca16-2', 'autoencoder16-2',
+    #             'pca30-3', 'autoencoder30-3', 'pca12-3', 'autoencoder12-3', 'pca32-3', 'autoencoder32-3', 'pca16-3', 'autoencoder16-3',
+    #             'pca30-4', 'autoencoder30-4', 'pca12-4', 'autoencoder12-4', 'pca32-4', 'autoencoder32-4', 'pca16-4', 'autoencoder16-4']
 
-Encodings = ['autoencoder30-3']
-best_trained_params_list = Benchmarking_Hybrid_Accuracy(dataset, classes, Unitary, U_num_param, Encodings, circuit, binary=True)
-# Benchmarking_Hybrid_Entanglement(dataset, classes, Encodings, N_samples, best_trained_params_list)
+    # number which behind pca or autoencoder is parameter number of X_train
+    # Example: autoencoder30 has X_train dimension (data number, 30)
+    Encodings = ['autoencoder30-3']
+    # Encodings = ['resize256']
+    best_trained_params_list = Benchmarking_Hybrid_Accuracy(dataset, classes, Unitary, U_num_param, Encodings, circuit, binary=True)
+    # Benchmarking_Hybrid_Entanglement(dataset, classes, Encodings, N_samples, best_trained_params_list)

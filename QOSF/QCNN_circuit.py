@@ -116,6 +116,7 @@ def QCNN(X, params, U, U_params, embedding_type='Amplitude', cost_fn='cross_entr
         print("Invalid Unitary Ansatze")
         return False
 
+    
     if cost_fn == 'mse':
         result = qml.expval(qml.PauliZ(4))
     elif cost_fn == 'cross_entropy':
