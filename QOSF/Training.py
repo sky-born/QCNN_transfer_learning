@@ -2,7 +2,7 @@
 import QCNN_circuit
 import Hierarchical_circuit
 import pennylane as qml
-import numpy as np
+from pennylane import numpy as np
 import autograd.numpy as anp
 
 def square_loss(labels, predictions):
@@ -26,7 +26,7 @@ def cross_entropy(labels, predictions):
     return -1 * loss
 
 def cost(params, X, Y, U, U_params, embedding_type, circuit, cost_fn):
-    if circuit == 'QCNN':
+    if circuit == 'QCNN' or circuit == 'QCNN_general_pooling':
         predictions = [QCNN_circuit.QCNN(x, params, U, U_params, embedding_type, cost_fn=cost_fn) for x in X]
     elif circuit == 'Hierarchical':
         predictions = [Hierarchical_circuit.Hierarchical_classifier(x, params, U, U_params, embedding_type, cost_fn=cost_fn) for x in X]
@@ -52,8 +52,10 @@ def circuit_training(X_train, Y_train, U, U_params, embedding_type, circuit, cos
         total_params = U_params * 3 + 2 * 3
     elif circuit == 'Hierarchical':
         total_params = U_params * 7
+    elif circuit == 'QCNN_general_pooling':
+        total_params = U_params * 3 + 6 * 3
 
-    params = np.random.randn(total_params)
+    params = np.random.randn(total_params, requires_grad=True)
     opt = qml.NesterovMomentumOptimizer(stepsize=learning_rate)
     # opt = qml.AdamOptimizer(stepsize=learning_rate)
     loss_history = []
@@ -66,8 +68,7 @@ def circuit_training(X_train, Y_train, U, U_params, embedding_type, circuit, cos
         X_batch = [X_train[i] for i in batch_index]
         Y_batch = [Y_train[i] for i in batch_index]
 
-        params, cost_new = opt.step_and_cost(lambda v: cost(v, X_batch, Y_batch, U, U_params, embedding_type, circuit, cost_fn),
-                                                     params)
+        params, cost_new = opt.step_and_cost(lambda v: cost(v, X_batch, Y_batch, U, U_params, embedding_type, circuit, cost_fn), params)
         loss_history.append(cost_new)
 
         # save best cost parameters -> can overfitting

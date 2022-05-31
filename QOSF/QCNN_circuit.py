@@ -51,6 +51,27 @@ def QCNN_structure(U, params, U_params):
     conv_layer3(U, param3)
     pooling_layer3(unitary.Pooling_ansatz1, param6)
 
+# general pooling QCNN structure
+def QCNN_structure_R(U, params, U_params):
+
+    param1 = params[0:U_params]
+    param2 = params[U_params: 2 * U_params]
+    param3 = params[2 * U_params: 3 * U_params]
+
+    param4 = params[3 * U_params: 3 * U_params + 6]
+    param5 = params[3 * U_params + 6: 3 * U_params + (6*2)]
+    param6 = params[3 * U_params + (6*2): 3 * U_params + (6*3)]
+
+
+    conv_layer1(U, param1)
+    pooling_layer1(unitary.Pooling_general1, param4)
+
+    conv_layer2(U, param2)
+    pooling_layer2(unitary.Pooling_general1, param5)
+
+    conv_layer3(U, param3)
+    pooling_layer3(unitary.Pooling_general1, param6)
+
 
 def QCNN_structure_without_pooling(U, params, U_params):
     param1 = params[0:U_params]
@@ -111,6 +132,30 @@ def QCNN(X, params, U, U_params, embedding_type='Amplitude', cost_fn='cross_entr
         QCNN_1D_circuit(unitary.U_SU4, params, U_params)
     elif U == 'U_9_1D':
         QCNN_1D_circuit(unitary.U_9, params, U_params)
+    elif U == 'U_ansatz_10':
+        QCNN_structure_without_pooling(unitary.U_ansatz_10, params, U_params)
+    elif U == 'U_TTN_R':
+        QCNN_structure_R(unitary.U_TTN_R, params, U_params)
+    elif U == 'U_5_R':
+        QCNN_structure_R(unitary.U_5_R, params, U_params)
+    elif U == 'U_6_R':
+        QCNN_structure_R(unitary.U_6_R, params, U_params)
+    elif U == 'U_9_R':
+        QCNN_structure_R(unitary.U_9_R, params, U_params)
+    elif U == 'U_13_R':
+        QCNN_structure_R(unitary.U_13_R, params, U_params)
+    elif U == 'U_14_R':
+        QCNN_structure_R(unitary.U_14_R, params, U_params)
+    elif U == 'U_15_R':
+        QCNN_structure_R(unitary.U_15_R, params, U_params)
+    elif U == 'U_SO4_R':
+        QCNN_structure_R(unitary.U_SO4_R, params, U_params)
+    elif U == 'U_SU4_R':
+        QCNN_structure_R(unitary.U_SU4_R, params, U_params)
+    elif U == 'Con_Z':
+        QCNN_structure(unitary.Con_Z, params, U_params)
+    elif U == 'Con_Z_R':
+        QCNN_structure_R(unitary.Con_Z, params, U_params)
 
     else:
         print("Invalid Unitary Ansatze")
