@@ -108,8 +108,7 @@ def QCNN_1D_circuit(U, params, U_params):
 dev = qml.device('default.qubit', wires=8)
 
 
-# @qml.qnode(dev)
-@qml.qnode(dev, interface='torch')  # for LBGFS
+@qml.qnode(dev)
 def QCNN(X, params, U, U_params, embedding_type='Amplitude', cost_fn='cross_entropy'):
 
     # Data Embedding

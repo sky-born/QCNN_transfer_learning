@@ -217,7 +217,7 @@ def Transfer_QCNN(dataset, classes, Unitary, U_num_param, emb, circuit, cost_fn)
 # U_num_param = 9
 
 # cost_fn can select 'cross_entropy' or 'mse'
-cost_fn = 'cross_entropy'
+cost_fn = 'mse'
 
 # Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
 
