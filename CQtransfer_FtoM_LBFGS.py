@@ -8,6 +8,8 @@ from tensorflow.keras.datasets import mnist
 from tensorflow.keras.datasets import fashion_mnist
 import tensorflow_hub as hub
 import pennylane as qml
+new_path = os.path.join(os.getcwd(), 'QOSF')
+sys.path.append(new_path)
 from QOSF import QCNN_circuit
 from QOSF import unitary
 from QOSF import embedding
@@ -15,8 +17,6 @@ import numpy as np
 from QOSF import Training
 from QOSF.Benchmarking import accuracy_test
 
-new_path = os.path.join(os.getcwd(), 'QOSF')
-sys.path.append(new_path)
 
 class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
@@ -37,60 +37,40 @@ input_layer_parameter = encoding_to_parameter[emb]
 # emb = 'Angular-Hybrid4-1' # see Benchmarking.py
 # emb = 'Angular-Hybrid4-1'
 
-model_start = keras.Sequential()
-model_start.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1), name='layer1'))
-model_start.add(layers.MaxPooling2D((2, 2), name='layer2'))
-model_start.add(layers.Conv2D(64, (3, 3), activation='relu', name='layer3'))
-model_start.add(layers.MaxPooling2D((2, 2), name='layer4'))
-model_start.add(layers.Conv2D(64, (3, 3), activation='relu', name='layer5'))
-model_start.add(layers.Flatten(name='layer6'))
-# this layer have to same number of input parameters of QCNN
-model_start.add(layers.Dense(input_layer_parameter, activation='relu', name='layer7'))
-# model_start.add(layers.LayerNormalization())
-model_start.add(layers.BatchNormalization())
-model_start.add(layers.Dense(30, activation='relu', name='layer8'))
-model_start.add(layers.Dense(10, activation='softmax', name='fin'))
+# by LBFGS
+# model_start = keras.Sequential()
+# model_start.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1), name='layer1'))
+# model_start.add(layers.MaxPooling2D((2, 2), name='layer2'))
+# model_start.add(layers.Conv2D(64, (3, 3), activation='relu', name='layer3'))
+# model_start.add(layers.MaxPooling2D((2, 2), name='layer4'))
+# model_start.add(layers.Conv2D(64, (3, 3), activation='relu', name='layer5'))
+# model_start.add(layers.Flatten(name='layer6'))
+# # this layer have to same number of input parameters of QCNN
+# model_start.add(layers.Dense(input_layer_parameter, activation='relu', name='layer7'))
+# # model_start.add(layers.LayerNormalization())
+# model_start.add(layers.BatchNormalization())
+# model_start.add(layers.Dense(30, activation='relu', name='layer8'))
+# model_start.add(layers.Dense(10, activation='softmax', name='fin'))
 
-filepath = "./save/pretrain.h5"
+# filepath = "./save/pretrain.h5"
 
-# Callback Earlystopping (cb) :
-# avoid overfitting during trainning
-# Callback ModelCheck (ck) :
-# monitoring training weight and save best weight or last weight
+# # Callback Earlystopping (cb) :
+# # avoid overfitting during trainning
+# # Callback ModelCheck (ck) :
+# # monitoring training weight and save best weight or last weight
 
-cb = tf.keras.callbacks.EarlyStopping(monitor='accuracy', mode='auto', restore_best_weights=True)
-ck = tf.keras.callbacks.ModelCheckpoint(filepath, monitor='accuracy', verbose=0, save_best_only=True, mode='auto')
+# cb = tf.keras.callbacks.EarlyStopping(monitor='accuracy', mode='auto', restore_best_weights=True)
+# ck = tf.keras.callbacks.ModelCheckpoint(filepath, monitor='accuracy', verbose=0, save_best_only=True, mode='auto')
 
-print("Basic pretrain model")
-print(model_start.summary())
+# print("Basic pretrain model")
+# print(model_start.summary())
 
-model_start.compile(optimizer='adam',
-                    loss='sparse_categorical_crossentropy',
-                    metrics=['accuracy'])
-model_start.fit(xtr, ytr, epochs=5, callbacks=[ck])
+# model_start.compile(optimizer='adam',
+#                     loss='sparse_categorical_crossentropy',
+#                     metrics=['accuracy'])
+# model_start.fit(xtr, ytr, epochs=5, callbacks=[ck])
 
-model_start.evaluate(xte, yte, verbose=2)
-
-# Transfer-learning workflow
-
-# 1. instantiate a base model and load pre-trained weights into it.
-# 2. Freeze all layers in the base model by setting "trainable = False."
-# 3. Create a new model on top of the output of one (or several) layers from the base model.
-# 4. Train your new model on your new dataset.
-
-# Alternative, lightweight workflow
-
-# 1. Instantiate a base model and load pre-trained weights into it.
-# 2. Run your new dataset through it and record the output of one (or several) layers
-# 3. from the base model. This is called feature extraction.
-# 4. Use that output as input data for a new, smaller model.
-
-# ref : https://keras.io/guides/transfer_learning/
-
-# Freeze layesrs = NO CHANGE during training
-# It is important to make a freezing the layers from the pre-trained model
-# for avoiding the weights in selected layers to be updated.
-
+# model_start.evaluate(xte, yte, verbose=2)
 
 model = keras.models.load_model("./save/pretrain.h5")
 # [print(i.trainable) for i in model.layers]
@@ -241,50 +221,9 @@ cost_fn = 'cross_entropy'
 
 # Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
 
-# Unitary_dict = {'U_TTN' : 2, 'U_5' : 10, 'U_6' : 10, 'U_9' : 2, 'U_13' : 6, 'U_14' : 6, 'U_15' : 4, 'U_SO4' : 6, 'U_SU4' : 15}
-
-# # bench mark
-# Unitary_dict = {'U_TTN' : 2, 'U_5' : 10, 'U_6' : 10, 'U_9' : 2, 'U_13' : 6, 'U_14' : 6, 'U_15' : 4, 'U_SO4' : 6, 'U_SU4' : 15,'Con_Z' : 0}
-# circuit = 'QCNN'
-# for Unitary in ['U_TTN', 'U_5', 'U_6', 'U_9', 'U_13', 'U_14', 'U_15', 'U_SO4', 'U_SU4','Con_Z']:
-#     U_num_param = Unitary_dict[Unitary]
-#     for classes in [[0,1],[2,3],[8,9]]:
-#         Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
-
-
-# for Unitary in ['U_TTN', 'U_5', 'U_6', 'U_9', 'U_13', 'U_14', 'U_15', 'U_SO4', 'U_SU4']:
-#     U_num_param = Unitary_dict[Unitary]
-#     Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
-
-Unitary_dict = {'U_TTN': 2, 'U_5': 10, 'U_6': 10, 'U_9': 2, 'U_13': 6, 'U_14': 6, 'U_15': 4, 'U_SO4': 6, 'U_SU4': 15, 'U_SU4_no_pooling': 15, 'U_ansatz_10': 9}
-circuit = 'QCNN'
-# for Unitary in ['U_ansatz_10']:
-for Unitary in ['U_SU4_no_pooling', 'U_ansatz_10']:
+Unitary_dict = {'U_TTN_R': 2, 'U_5_R': 10, 'U_6_R': 10, 'U_9_R': 2, 'U_13_R': 6, 'U_14_R': 6, 'U_15_R': 4, 'U_SO4_R': 6, 'U_SU4_R': 15,'Con_Z_R': 0}
+circuit = 'QCNN_general_pooling'
+for Unitary in ['U_13_R']:
     U_num_param = Unitary_dict[Unitary]
-    for classes in [[0, 1], [2, 3], [8, 9]]:
+    for classes in [[2, 3]]:
         Transfer_QCNN(dataset, classes, Unitary, U_num_param, emb, circuit, cost_fn)
-
-
-# Unitary_dict = {'U_TTN_R' : 2, 'U_5_R' : 10, 'U_6_R' : 10, 'U_9_R' : 2, 'U_13_R' : 6, 'U_14_R' : 6, 'U_15_R' : 4, 'U_SO4_R' : 6, 'U_SU4_R' : 15}
-# circuit = 'QCNN_general_pooling'
-# for Unitary in ['U_TTN_R','U_5_R','U_6_R','U_9_R','U_13_R','U_14_R','U_15_R','U_SO4_R','U_SU4_R']:
-#     U_num_param = Unitary_dict[Unitary]
-#     for classes in [[0,1],[2,3],[8,9]]:
-#         Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
-
-# Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
-
-# Unitary_dict = {'U_TTN_R' : 2, 'U_5_R' : 10, 'U_6_R' : 10, 'U_9_R' : 2, 'U_13_R' : 6, 'U_14_R' : 6, 'U_15_R' : 4, 'U_SO4_R' : 6, 'U_SU4_R' : 15,'Con_Z_R' : 0}
-# circuit = 'QCNN_general_pooling'
-# for Unitary in ['U_TTN_R', 'U_5_R', 'U_6_R', 'U_9_R', 'U_13_R', 'U_14_R', 'U_15_R', 'U_SO4_R', 'U_SU4_R','Con_Z_R']:
-#     U_num_param = Unitary_dict[Unitary]
-#     for classes in [[0,1],[2,3],[8,9]]:
-#     # for classes in [[0,1],[8,9]]:
-#         Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
-
-# Unitary_dict = {'U_TTN_R' : 2, 'U_5_R' : 10, 'U_6_R' : 10, 'U_9_R' : 2, 'U_13_R' : 6, 'U_14_R' : 6, 'U_15_R' : 4, 'U_SO4_R' : 6, 'U_SU4_R' : 15,'Con_Z_R' : 0}
-# circuit = 'QCNN_general_pooling'
-# for Unitary in ['Con_Z_R']:
-#     U_num_param = Unitary_dict[Unitary]
-#     for classes in [[0,1],[2,3],[8,9]]:
-#         Transfer_QCNN(dataset,classes,Unitary,U_num_param,emb,circuit,cost_fn)
