@@ -1,9 +1,10 @@
 # Implementaion of Hierarchical Quantum Classifier Structure.
 import pennylane as qml
-import unitary
-import embedding
+from QOSF import unitary
+from QOSF import embedding
 
 dev_TTN = qml.device('default.qubit', wires=8)
+
 
 def Hierarchical_structure(U, params, U_params):
     param1 = params[0 * U_params:1 * U_params]
@@ -24,7 +25,6 @@ def Hierarchical_structure(U, params, U_params):
     U(param6, wires=[5, 7])
     # 3rd Layer
     U(param7, wires=[3, 7])
-
 
 
 @qml.qnode(dev_TTN)

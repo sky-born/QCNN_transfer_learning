@@ -1,6 +1,7 @@
 # This is an implementation of an alternative Mottonen State Preparation to avoid normalization problem.
 import pennylane as qml
 
+
 # 3 bits of information is embedded in 2 wires
 def Angular_Hybrid_2(X, wires):
     qml.RY(X[0], wires=wires[0])
@@ -9,6 +10,7 @@ def Angular_Hybrid_2(X, wires):
     qml.CRY(X[1], wires=[wires[0], wires[1]])
     qml.PauliX(wires=wires[0])
     qml.CRY(X[2], wires=[wires[0], wires[1]])
+
 
 # 15 bits of information is embedded in 4 wires
 def Angular_Hybrid_4(X, wires):

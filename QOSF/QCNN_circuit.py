@@ -1,7 +1,7 @@
 # Implementation of Quantum Convolutional Neural Network (QCNN) circuit structure.
 import pennylane as qml
-import unitary
-import embedding
+from QOSF import unitary
+from QOSF import embedding
 
 
 # Convolutional layers

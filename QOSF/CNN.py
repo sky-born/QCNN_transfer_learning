@@ -1,17 +1,19 @@
-import data
+from QOSF import data
 import numpy as np
 import torch
 import torch.nn as nn
 
+
 def get_n_params(model):
-    np=0
+    np = 0
     for p in list(model.parameters()):
         np += p.nelement()
     return np
 
+
 def accuracy_test(predictions, labels):
     acc = 0
-    for (p,l) in zip(predictions, labels):
+    for (p, l) in zip(predictions, labels):
         if p[0] >= p[1]:
             pred = 0
         else:
@@ -22,9 +24,12 @@ def accuracy_test(predictions, labels):
     acc = acc / len(labels)
     return acc
 
+
 steps = 200
 n_feature = 2
 batch_size = 25
+
+
 def Benchmarking_CNN(dataset, classes, Encodings, Encodings_size, binary, optimizer):
     for i in range(len(Encodings)):
         Encoding = Encodings[i]
@@ -76,13 +81,12 @@ def Benchmarking_CNN(dataset, classes, Encodings, Encodings_size, binary, optimi
             accuracy = accuracy_test(Y_pred, Y_test)
             N_params = get_n_params(CNN)
 
-
         f = open('Result/result_CNN.txt', 'a')
-        f.write("Loss History for CNN with " + str(Encoding) + ":" )
+        f.write("Loss History for CNN with " + str(Encoding) + ":")
         f.write("\n")
         f.write(str(loss_history))
         f.write("\n")
-        f.write("Accuracy for CNN with " + str(Encoding) + " " +optimizer + ": " + str(accuracy))
+        f.write("Accuracy for CNN with " + str(Encoding) + " " + optimizer + ": " + str(accuracy))
         f.write("\n")
         f.write("Number of Parameters used to train CNN: " + str(N_params))
         f.write("\n")
@@ -90,9 +94,10 @@ def Benchmarking_CNN(dataset, classes, Encodings, Encodings_size, binary, optimi
 
     f.close()
 
+
 steps = 200
 dataset = 'fashion_mnist'
-classes = [0,1]
+classes = [0, 1]
 binary = False
 Encodings = ['pca8', 'autoencoder8', 'pca16-compact', 'autoencoder16-compact']
 Encodings_size = [8, 8, 16, 16]
@@ -100,5 +105,5 @@ Encodings_size = [8, 8, 16, 16]
 for i in range(5):
     Benchmarking_CNN(dataset=dataset, classes=classes, Encodings=Encodings, Encodings_size=Encodings_size,
                      binary=binary, optimizer='adam')
-    #Benchmarking_CNN(dataset=dataset, classes=classes, Encodings=Encodings, Encodings_size=Encodings_size,
+    # Benchmarking_CNN(dataset=dataset, classes=classes, Encodings=Encodings, Encodings_size=Encodings_size,
     #                 binary=binary, optimizer='nesterov')

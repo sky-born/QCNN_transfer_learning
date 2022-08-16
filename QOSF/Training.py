@@ -2,8 +2,8 @@
 from struct import pack
 
 from numpy import double
-import QCNN_circuit
-import Hierarchical_circuit
+from QOSF import QCNN_circuit
+from QOSF import Hierarchical_circuit
 import pennylane as qml
 from pennylane import numpy as np
 import autograd.numpy as anp
@@ -11,8 +11,8 @@ import autograd.numpy as anp
 
 def square_loss(labels, predictions):
     loss = 0
-    for l, p in zip(labels, predictions):
-        loss = loss + (l - p) ** 2
+    for label, p in zip(labels, predictions):
+        loss = loss + (label - p) ** 2
 
     loss = loss / len(labels)
     return loss
@@ -21,11 +21,11 @@ def square_loss(labels, predictions):
 def cross_entropy(labels, predictions):
     loss = 0
     delta = 1e-7
-    for l, p in zip(labels, predictions):
-        # l is 1 or -1, p is probability numpy array with length 2
-        if l == -1:
-            l = 0
-        c_entropy = l * (anp.log(p[l] + delta)) + (1 - l) * anp.log(1 - p[1 - l] + delta)
+    for label, p in zip(labels, predictions):
+        # label is 1 or -1, p is probability numpy array with length 2
+        if label == -1:
+            label = 0
+        c_entropy = label * (anp.log(p[label] + delta)) + (1 - label) * anp.log(1 - p[1 - label] + delta)
         loss = loss + c_entropy
     return -1 * loss
 
@@ -67,7 +67,6 @@ def circuit_training(X_train, Y_train, U, U_params, embedding_type, circuit, cos
     loss_history = []
     # best_cost = None
     # best_params = None
-
 
     for it in range(steps):
 

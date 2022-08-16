@@ -1,33 +1,34 @@
-import data
-import Training
-import QCNN_circuit
-import Hierarchical_circuit
+from QOSF import data
+from QOSF import Training
+from QOSF import QCNN_circuit
+from QOSF import Hierarchical_circuit
 import numpy as np
 
-def accuracy_test(predictions, labels, cost_fn, binary = True):
+
+def accuracy_test(predictions, labels, cost_fn, binary=True):
     if cost_fn == 'mse':
-        if binary == True:
+        if binary is True:
             acc = 0
-            for l, p in zip(labels, predictions):
-                if np.abs(l - p) < 1:
+            for label, p in zip(labels, predictions):
+                if np.abs(label - p) < 1:
                     acc = acc + 1
             return acc / len(labels)
 
         else:
             acc = 0
-            for l, p in zip(labels, predictions):
-                if np.abs(l - p) < 0.5:
+            for label, p in zip(labels, predictions):
+                if np.abs(label - p) < 0.5:
                     acc = acc + 1
             return acc / len(labels)
-    # for l is 0 or 1
+    # for label is 0 or 1
     elif cost_fn == 'cross_entropy':
         acc = 0
-        for l,p in zip(labels, predictions):
+        for label, p in zip(labels, predictions):
             if p[0] > p[1]:
                 P = 0
             else:
                 P = 1
-            if P == l:
+            if P == label:
                 acc = acc + 1
         return acc / len(labels)
 
@@ -144,10 +145,10 @@ def Encoding_to_Embedding(Encoding):
 
 
 def Benchmarking(dataset, classes, Unitaries, U_num_params, Encodings, circuit, cost_fn, binary=True):
-    I = len(Unitaries)
+    Unitary_length = len(Unitaries)
     J = len(Encodings)
 
-    for i in range(I):
+    for i in range(Unitary_length):
         for j in range(J):
             f = open('Result/result.txt', 'a')
             U = Unitaries[i]
@@ -179,6 +180,7 @@ def Benchmarking(dataset, classes, Unitaries, U_num_params, Encodings, circuit, 
             f.write("\n")
     f.close()
 
+
 def Data_norm(dataset, classes, Encodings, binary=True):
     J = len(Encodings)
     Num_data = 10000
@@ -188,8 +190,7 @@ def Data_norm(dataset, classes, Encodings, binary=True):
     for j in range(J):
         Encoding = Encodings[j]
 
-        X_train, X_test, Y_train, Y_test = data.data_load_and_process(dataset, classes=classes,
-                                                                          feature_reduction=Encoding, binary=binary)
+        X_train, X_test, Y_train, Y_test = data.data_load_and_process(dataset, classes=classes, feature_reduction=Encoding, binary=binary)
 
         if Encoding == 'pca32-3' or Encoding == 'autoencoder32-3':
             norms_X1 = []

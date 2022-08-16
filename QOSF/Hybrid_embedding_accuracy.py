@@ -1,15 +1,16 @@
 # This module implements the measurement method of the entangling capability
 import pennylane as qml
-import QCNN_circuit
-import unitary
-import embedding
+from QOSF import QCNN_circuit
+from QOSF import unitary
+from QOSF import embedding
 import numpy as np
-import data
-import Training
-from Benchmarking import Encoding_to_Embedding, accuracy_test
+from QOSF import data
+from QOSF import Training
+from QOSF.Benchmarking import Encoding_to_Embedding, accuracy_test
 
 
 dev = qml.device('default.qubit', wires=8)
+
 
 @qml.qnode(dev)
 def QCNN_partial_trace(X, params, embedding_type='Angular-Hybrid4', qubit_index=0):
@@ -17,15 +18,17 @@ def QCNN_partial_trace(X, params, embedding_type='Angular-Hybrid4', qubit_index=
     QCNN_circuit.conv_layer1(unitary.U_SU4, params)
     return qml.density_matrix(wires=qubit_index)
 
+
 def Meyer_Wallach(X, params, embedding_type):
-   n = 8
-   measure = 0
-   for j in range(n):
+    n = 8
+    measure = 0
+    for j in range(n):
         rho = QCNN_partial_trace(X, params, embedding_type, qubit_index=j)
         rho_squared = np.matmul(rho, rho)
         rho_squared_traced = np.matrix.trace(rho_squared)
-        measure = measure + 1/2 * (1 - rho_squared_traced)
-   return measure * 4 / n
+        measure = measure + 1 / 2 * (1 - rho_squared_traced)
+    return measure * 4 / n
+
 
 def Benchmarking_Hybrid_Accuracy(dataset, classes, Unitary, U_num_param, Encodings, circuit, binary=True):
     U = Unitary
@@ -50,7 +53,7 @@ def Benchmarking_Hybrid_Accuracy(dataset, classes, Unitary, U_num_param, Encodin
             loss_history, trained_params = Training.circuit_training(X_train, Y_train, U, U_params, Embedding, circuit, cost_fn)
             predictions = [QCNN_circuit.QCNN(x, trained_params, U, U_params, Embedding) for x in X_test]
             accuracy = accuracy_test(predictions, Y_test, cost_fn, binary)
-            print('accuracy',accuracy)
+            print('accuracy', accuracy)
             print("Accuracy for " + U + " " + Encoding + " :" + str(accuracy))
 
             trained_params_list.append(trained_params)
@@ -68,6 +71,7 @@ def Benchmarking_Hybrid_Accuracy(dataset, classes, Unitary, U_num_param, Encodin
 
     f.close()
     return best_trained_params_list
+
 
 def Benchmarking_Hybrid_Entanglement(dataset, classes, Encodings, N_samples, best_trained_params_list):
     for i in range(len(Encodings)):
@@ -98,7 +102,7 @@ def Benchmarking_Hybrid_Entanglement(dataset, classes, Encodings, N_samples, bes
 
 if __name__ == "__main__":
     dataset = 'mnist'
-    classes = [0,1]
+    classes = [0, 1]
 
     # Unitary and unitary parameters are written in unitary.py
     Unitary = 'U_SU4'
@@ -111,8 +115,7 @@ if __name__ == "__main__":
     # cost_fn can select 'cross_entropy' or 'mse'
     cost_fn = 'cross_entropy'
 
-
-    #Encodings = ['pca30-1', 'autoencoder30-1', 'pca12-1', 'autoencoder12-1', 'pca32-1', 'autoencoder32-1', 'pca16-1', 'autoencoder16-1',
+    # Encodings = ['pca30-1', 'autoencoder30-1', 'pca12-1', 'autoencoder12-1', 'pca32-1', 'autoencoder32-1', 'pca16-1', 'autoencoder16-1',
     #             'pca30-2', 'autoencoder30-2', 'pca12-2', 'autoencoder12-2', 'pca32-2', 'autoencoder32-2', 'pca16-2', 'autoencoder16-2',
     #             'pca30-3', 'autoencoder30-3', 'pca12-3', 'autoencoder12-3', 'pca32-3', 'autoencoder32-3', 'pca16-3', 'autoencoder16-3',
     #             'pca30-4', 'autoencoder30-4', 'pca12-4', 'autoencoder12-4', 'pca32-4', 'autoencoder32-4', 'pca16-4', 'autoencoder16-4']

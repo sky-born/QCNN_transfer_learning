@@ -13,6 +13,7 @@ autoencoder16 = ['autoencoder16-1', 'autoencoder16-2', 'autoencoder16-3', 'autoe
 pca12 = ['pca12-1', 'pca12-2', 'pca12-3', 'pca12-4']
 autoencoder12 = ['autoencoder12-1', 'autoencoder12-2', 'autoencoder12-3', 'autoencoder12-4']
 
+
 def data_load_and_process(dataset, classes=[0, 1], feature_reduction='resize256', binary=True):
     if dataset == 'fashion_mnist':
         (x_train, y_train), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
@@ -26,10 +27,10 @@ def data_load_and_process(dataset, classes=[0, 1], feature_reduction='resize256'
         X_train = x_train
         X_test = x_test
         # Y is 1,0 for binary false or 1,-1 for binary true
-        if binary == False:
+        if binary is False:
             Y_train = [1 if y in odd else 0 for y in y_train]
             Y_test = [1 if y in odd else 0 for y in y_test]
-        elif binary == True:
+        elif binary is True:
             Y_train = [1 if y in odd else -1 for y in y_train]
             Y_test = [1 if y in odd else -1 for y in y_test]
 
@@ -37,10 +38,10 @@ def data_load_and_process(dataset, classes=[0, 1], feature_reduction='resize256'
         greater = [5, 6, 7, 8, 9]
         X_train = x_train
         X_test = x_test
-        if binary == False:
+        if binary is False:
             Y_train = [1 if y in greater else 0 for y in y_train]
             Y_test = [1 if y in greater else 0 for y in y_test]
-        elif binary == True:
+        elif binary is True:
             Y_train = [1 if y in greater else -1 for y in y_train]
             Y_test = [1 if y in greater else -1 for y in y_test]
 
@@ -54,17 +55,17 @@ def data_load_and_process(dataset, classes=[0, 1], feature_reduction='resize256'
         X_train, X_test = x_train[x_train_filter_01], x_test[x_test_filter_01]
         Y_train, Y_test = y_train[x_train_filter_01], y_test[x_test_filter_01]
 
-        if binary == False:
+        if binary is False:
             Y_train = [1 if y == classes[0] else 0 for y in Y_train]
             Y_test = [1 if y == classes[0] else 0 for y in Y_test]
-        elif binary == True:
+        elif binary is True:
             Y_train = [1 if y == classes[0] else -1 for y in Y_train]
             Y_test = [1 if y == classes[0] else -1 for y in Y_test]
 
     if feature_reduction == 'resize256':
         X_train = tf.image.resize(X_train[:], (256, 1)).numpy()
         X_test = tf.image.resize(X_test[:], (256, 1)).numpy()
-        # tf.squeeze returns a tensor of the same type with all dimensions of size 1 removed. 
+        # tf.squeeze returns a tensor of the same type with all dimensions of size 1 removed.
         X_train, X_test = tf.squeeze(X_train).numpy(), tf.squeeze(X_test).numpy()
         return X_train, X_test, Y_train, Y_test
 
@@ -85,7 +86,6 @@ def data_load_and_process(dataset, classes=[0, 1], feature_reduction='resize256'
             pca = PCA(16)
         elif feature_reduction in pca12:
             pca = PCA(12)
-
 
         X_train = pca.fit_transform(X_train)
         X_test = pca.transform(X_test)
@@ -110,8 +110,6 @@ def data_load_and_process(dataset, classes=[0, 1], feature_reduction='resize256'
             latent_dim = 16
         elif feature_reduction in autoencoder12:
             latent_dim = 12
-
-
 
         class Autoencoder(Model):
             def __init__(self, latent_dim):
@@ -149,4 +147,3 @@ def data_load_and_process(dataset, classes=[0, 1], feature_reduction='resize256'
                               (X_test - X_test.min()) * (np.pi / (X_test.max() - X_test.min()))
 
         return X_train, X_test, Y_train, Y_test
-
